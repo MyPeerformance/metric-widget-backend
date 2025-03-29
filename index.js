@@ -17,49 +17,66 @@ const openai = new OpenAI({
 app.post("/generate", async (req, res) => {
   const sector = (req.body.sector || "professional services").trim();
 
-  const prompt = `
-You are an expert in performance benchmarking.
-
-Generate a set of 6–8 monthly performance studies specifically tailored for a business in the "${sector}" sector.
-
-Each study must be returned as a styled HTML card using this exact format:
-
-<div style="border: 1px solid #ccc; border-radius: 10px; padding: 16px; background-color: #111; width: 100%; max-width: 500px; font-family: sans-serif;">
-  <h3 style="color: white; font-size: 18px; margin-bottom: 10px;">[Metric Name]</h3>
-  <p style="color: grey; margin: 6px 0;"><strong>Description:</strong> [Brief explanation of the metric]</p>
-  <p style="color: grey; margin: 6px 0;"><strong>Calculation:</strong> [Mathematical or logical formula]</p>
-</div>
-
-✅ Only return the HTML. Do not explain, summarize, or add extra text.
-✅ Be accurate and concise. Make the cards suitable for display in a business-facing web app.
-  `;
-
   try {
-    const chatResponse = await openai.chat.completions.create({
+    // Step 1: Get AI Insight
+    const insightPrompt = `
+You are writing a short intro for Peerformance, an app that lets companies benchmark key business metrics securely against similar businesses.
+
+For the sector "${sector}", generate 2–3 sentences explaining:
+- What kinds of subcategories or peer groups might be available in Peerformance (e.g. large/small, chains/independents)
+- That region filters can be applied to make peer groups even more relevant
+- Close with: "Here are some suitable studies you could use."
+Return only the paragraph — no heading or HTML tags.
+    `;
+
+    const insightResponse = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "You generate benchmarking study cards in clean HTML using a strict layout.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+      messages: [{ role: "user", content: insightPrompt }],
       temperature: 0.6,
     });
 
-    const reply = chatResponse.choices[0].message.content;
-    res.send(reply);
+    const insightText = insightResponse.choices[0].message.content;
+
+    // Step 2: Generate HTML metric cards
+    const metricPrompt = `
+Generate 6–8 benchmarking studies tailored to the "${sector}" sector.
+
+Each study should include:
+- A metric name
+- A short description
+- A clear calculation formula
+
+Format each study using this exact HTML structure:
+
+<div style="border: 1px solid #ccc; border-radius: 10px; padding: 16px; background-color: #111; width: 100%; max-width: 500px; font-family: sans-serif;">
+  <h3 style="color: white; font-size: 18px; margin-bottom: 10px;">[Metric Name]</h3>
+  <p style="color: grey; margin: 6px 0;"><strong>Description:</strong> [Brief explanation]</p>
+  <p style="color: grey; margin: 6px 0;"><strong>Calculation:</strong> [Formula]</p>
+</div>
+
+Only return the list of HTML blocks. No intro, headings or notes.
+    `;
+
+    const metricResponse = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: metricPrompt }],
+      temperature: 0.6,
+    });
+
+    const metricCards = metricResponse.choices[0].message.content;
+
+    // Send combined response
+    res.json({
+      insight: insightText,
+      html: metricCards
+    });
+
   } catch (error) {
     console.error("OpenAI error:", error);
-    res.status(500).send(`
-      <div style="color: white; font-family: sans-serif;">
-        <h2>Something went wrong</h2>
-        <p style="color: grey;">Please try again later.</p>
-      </div>
-    `);
+    res.status(500).json({
+      insight: "We couldn't generate an insight at the moment.",
+      html: `<p style="color: red;">Something went wrong while generating studies. Please try again later.</p>`
+    });
   }
 });
 
