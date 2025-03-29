@@ -18,7 +18,6 @@ app.post("/generate", async (req, res) => {
   const sector = (req.body.sector || "professional services").trim();
 
   try {
-    // Step 1: Generate Insight Text (Shortened version)
     const insightPrompt = `
 Write a short insight (2 short sentences max) for the Peerformance benchmarking app for the sector "${sector}".
 
@@ -38,7 +37,6 @@ Keep it concise, clear, and sector-specific. No headings or quotes.
 
     const insightText = insightResponse.choices[0].message.content;
 
-    // Step 2: Generate Sector-Specific Metric Cards
     const metricPrompt = `
 Generate 6–8 benchmarking studies tailored to the "${sector}" sector.
 
@@ -53,8 +51,8 @@ Format each study using this exact HTML structure:
 
 <div style="border: 1px solid #ccc; border-radius: 10px; padding: 16px; background-color: #111; width: 100%; max-width: 500px; font-family: sans-serif;">
   <h3 style="color: white; font-size: 18px; margin-bottom: 10px;">[Metric Name]</h3>
-  <p style="color: grey; margin: 6px 0;"><strong style="color: white;">Description:</strong> [Brief explanation]</p>
-  <p style="color: grey; margin: 6px 0;"><strong style="color: white;">Calculation:</strong> [Formula]</p>
+  <p style="color: grey; margin: 6px 0;"><span style="color: white;">Description:</span> [Brief explanation]</p>
+  <p style="color: grey; margin: 6px 0;"><span style="color: white;">Calculation:</span> [Formula]</p>
 </div>
 
 Only return the list of HTML blocks. No intro, headings or notes.
@@ -68,7 +66,6 @@ Only return the list of HTML blocks. No intro, headings or notes.
 
     const metricCards = metricResponse.choices[0].message.content;
 
-    // Send combined response
     res.json({
       insight: insightText,
       html: metricCards,
@@ -86,6 +83,7 @@ Only return the list of HTML blocks. No intro, headings or notes.
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
+
 
 
 
