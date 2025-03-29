@@ -18,7 +18,7 @@ app.post("/generate", async (req, res) => {
   const sector = (req.body.sector || "professional services").trim();
 
   try {
-    // Step 1: Get AI Insight
+    // Step 1: Generate Insight Text
     const insightPrompt = `
 You are writing a short intro for Peerformance, an app that lets companies benchmark key business metrics securely against similar businesses.
 
@@ -37,9 +37,11 @@ Return only the paragraph — no heading or HTML tags.
 
     const insightText = insightResponse.choices[0].message.content;
 
-    // Step 2: Generate HTML metric cards
+    // Step 2: Generate Sector-Specific Metric Cards
     const metricPrompt = `
 Generate 6–8 benchmarking studies tailored to the "${sector}" sector.
+
+Make sure the FIRST study is highly relevant to the sector and uses sector-specific terminology.
 
 Each study should include:
 - A metric name
@@ -50,8 +52,8 @@ Format each study using this exact HTML structure:
 
 <div style="border: 1px solid #ccc; border-radius: 10px; padding: 16px; background-color: #111; width: 100%; max-width: 500px; font-family: sans-serif;">
   <h3 style="color: white; font-size: 18px; margin-bottom: 10px;">[Metric Name]</h3>
-  <p style="color: grey; margin: 6px 0;"><strong>Description:</strong> [Brief explanation]</p>
-  <p style="color: grey; margin: 6px 0;"><strong>Calculation:</strong> [Formula]</p>
+  <p style="color: grey; margin: 6px 0;"><strong style="color: white;">Description:</strong> [Brief explanation]</p>
+  <p style="color: grey; margin: 6px 0;"><strong style="color: white;">Calculation:</strong> [Formula]</p>
 </div>
 
 Only return the list of HTML blocks. No intro, headings or notes.
@@ -68,7 +70,7 @@ Only return the list of HTML blocks. No intro, headings or notes.
     // Send combined response
     res.json({
       insight: insightText,
-      html: metricCards
+      html: metricCards,
     });
 
   } catch (error) {
