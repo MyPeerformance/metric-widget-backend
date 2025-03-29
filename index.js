@@ -19,20 +19,21 @@ app.post("/generate", async (req, res) => {
 
   try {
     const insightPrompt = `
-Write a short insight (2 short sentences max) for the Peerformance benchmarking app for the sector "${sector}".
+You're an expert market strategist writing for a performance benchmarking app called Peerformance.
 
-Briefly highlight:
-- A specific business challenge or goal for the sector
-- That Peerformance helps compare metrics securely with peer groups by business type and region
-- Finish with: "Here are some studies that may be useful for this sector."
+Write 2 short and unique sentences that:
+- Are directly relevant to the sector: "${sector}"
+- Mention the kinds of sub-categories in that industry that Peerformance can benchmark
+- Mention that region-based peer groups are also available
+- End with a variation of: "Here are some studies that may be useful."
 
-Keep it concise, clear, and sector-specific. No headings or quotes.
-    `;
+Avoid repeating phrases you've used before. Keep it original and natural.
+`;
 
     const insightResponse = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: insightPrompt }],
-      temperature: 0.6,
+      temperature: 0.8,
     });
 
     const insightText = insightResponse.choices[0].message.content;
@@ -51,12 +52,12 @@ Format each study using this exact HTML structure:
 
 <div style="border: 1px solid #ccc; border-radius: 10px; padding: 16px; background-color: #111; width: 100%; max-width: 500px; font-family: sans-serif;">
   <h3 style="color: white; font-size: 18px; margin-bottom: 10px;">[Metric Name]</h3>
-  <p style="color: grey; margin: 6px 0;"><span style="color: white;">Description:</span> [Brief explanation]</p>
-  <p style="color: grey; margin: 6px 0;"><span style="color: white;">Calculation:</span> [Formula]</p>
+  <p style="color: grey; margin: 6px 0;"><span style="color: white; font-weight: normal;">Description:</span> [Brief explanation]</p>
+  <p style="color: grey; margin: 6px 0;"><span style="color: white; font-weight: normal;">Calculation:</span> [Formula]</p>
 </div>
 
 Only return the list of HTML blocks. No intro, headings or notes.
-    `;
+`;
 
     const metricResponse = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
