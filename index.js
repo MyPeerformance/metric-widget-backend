@@ -20,13 +20,15 @@ app.post("/generate", async (req, res) => {
   try {
     // Step 1: Generate Insight Text
     const insightPrompt = `
-You are writing a short intro for Peerformance, an app that lets companies benchmark key business metrics securely against similar businesses.
+You are writing an introductory insight for Peerformance, a benchmarking platform for professional services.
 
-For the sector "${sector}", generate 2–3 sentences explaining:
-- What kinds of subcategories or peer groups might be available in Peerformance (e.g. large/small, chains/independents)
-- That region filters can be applied to make peer groups even more relevant
-- Close with: "Here are some suitable studies you could use."
-Return only the paragraph — no heading or HTML tags.
+For the sector "${sector}", write 2–3 sentences that:
+- Reference the unique business challenges, goals or competitive pressures relevant to this sector
+- Mention how Peerformance allows businesses in this sector to compare key performance metrics securely with relevant peer groups (e.g. by size, type, or business model)
+- Add that regional filters can be applied to refine comparisons
+- Conclude with a sentence like: "Here are some studies that would be particularly useful for businesses in this sector."
+
+Be specific to the sector. Write clearly and professionally. Return only the paragraph — no headings, no quotes.
     `;
 
     const insightResponse = await openai.chat.completions.create({
@@ -85,4 +87,5 @@ Only return the list of HTML blocks. No intro, headings or notes.
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
+
 
