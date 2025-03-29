@@ -1,3 +1,5 @@
+
+
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -20,16 +22,22 @@ app.post("/generate", async (req, res) => {
   const prompt = `
 You are an expert in business benchmarking and performance analysis.
 
-Generate a set of monthly performance studies tailored specifically for a business in the "${sector}" sector.
+Generate a set of monthly performance studies specifically tailored for a business in the "${sector}" sector.
 
 Each study should include:
-- A **Metric Name**
-- A **Short Description**
-- A **Scaling Method** that allows firms of all sizes (small and large) to compare fairly.
+- A metric name
+- A short description
+- A scaling method that allows comparison across small and large businesses
 
-Format your response as a clean HTML block, suitable for display as mobile-friendly cards (stacked vertically). Use white headers, grey text, and subtle spacing.
+⚠️ IMPORTANT: Format each study as a mobile-friendly HTML card using this exact structure:
 
-Avoid any summary or intro — just output the styled study cards.
+<div style="border: 1px solid #ccc; border-radius: 10px; padding: 16px; background-color: #111; width: 100%; max-width: 500px; font-family: sans-serif;">
+  <h3 style="color: white; font-size: 18px; margin-bottom: 10px;">[Metric Name]</h3>
+  <p style="color: grey; margin: 6px 0;"><strong>Description:</strong> [Short Description]</p>
+  <p style="color: grey; margin: 6px 0;"><strong>Scaling Method:</strong> [Scaling explanation]</p>
+</div>
+
+Return 6–8 different cards, stacked one after another. Do not include any headings, intros, explanations, or notes.
   `;
 
   try {
@@ -38,7 +46,7 @@ Avoid any summary or intro — just output the styled study cards.
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant that generates sector-specific performance study cards in HTML.",
+          content: "You are a helpful assistant that outputs benchmarking studies as styled HTML cards.",
         },
         {
           role: "user",
@@ -64,4 +72,3 @@ Avoid any summary or intro — just output the styled study cards.
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
-
