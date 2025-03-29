@@ -1,5 +1,3 @@
-
-
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -20,24 +18,20 @@ app.post("/generate", async (req, res) => {
   const sector = (req.body.sector || "professional services").trim();
 
   const prompt = `
-You are an expert in business benchmarking and performance analysis.
+You are an expert in performance benchmarking.
 
-Generate a set of monthly performance studies specifically tailored for a business in the "${sector}" sector.
+Generate a set of 6–8 monthly performance studies specifically tailored for a business in the "${sector}" sector.
 
-Each study should include:
-- A metric name
-- A short description
-- A scaling method that allows comparison across small and large businesses
-
-⚠️ IMPORTANT: Format each study as a mobile-friendly HTML card using this exact structure:
+Each study must be returned as a styled HTML card using this exact format:
 
 <div style="border: 1px solid #ccc; border-radius: 10px; padding: 16px; background-color: #111; width: 100%; max-width: 500px; font-family: sans-serif;">
   <h3 style="color: white; font-size: 18px; margin-bottom: 10px;">[Metric Name]</h3>
-  <p style="color: grey; margin: 6px 0;"><strong>Description:</strong> [Short Description]</p>
-  <p style="color: grey; margin: 6px 0;"><strong>Scaling Method:</strong> [Scaling explanation]</p>
+  <p style="color: grey; margin: 6px 0;"><strong>Description:</strong> [Brief explanation of the metric]</p>
+  <p style="color: grey; margin: 6px 0;"><strong>Calculation:</strong> [Mathematical or logical formula]</p>
 </div>
 
-Return 6–8 different cards, stacked one after another. Do not include any headings, intros, explanations, or notes.
+✅ Only return the HTML. Do not explain, summarize, or add extra text.
+✅ Be accurate and concise. Make the cards suitable for display in a business-facing web app.
   `;
 
   try {
@@ -46,7 +40,7 @@ Return 6–8 different cards, stacked one after another. Do not include any head
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant that outputs benchmarking studies as styled HTML cards.",
+          content: "You generate benchmarking study cards in clean HTML using a strict layout.",
         },
         {
           role: "user",
@@ -63,7 +57,7 @@ Return 6–8 different cards, stacked one after another. Do not include any head
     res.status(500).send(`
       <div style="color: white; font-family: sans-serif;">
         <h2>Something went wrong</h2>
-        <p style="color: grey;">Our content generator is temporarily unavailable. Please try again later.</p>
+        <p style="color: grey;">Please try again later.</p>
       </div>
     `);
   }
