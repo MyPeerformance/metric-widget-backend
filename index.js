@@ -1,11 +1,11 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
-const { OpenAI } = require("openai");
+const bodyParser = require("body-parser");
 require("dotenv").config();
 
+const { OpenAI } = require("openai");
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 10000;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -15,37 +15,53 @@ const openai = new OpenAI({
 });
 
 app.post("/generate", async (req, res) => {
-  const sector = req.body.sector;
+  const sector = (req.body.sector || "professional services").trim();
 
   const prompt = `
-Generate 8 performance metrics for a ${sector} business. 
-Each metric should include:
-- a short title
-- a 1-line description
-- a calculation
+You are an expert in business benchmarking and performance analysis.
 
-Format the result in dark-themed HTML card format like this:
-<div style="background-color:#1a1a1a; border:1px solid #666; padding:16px; width:300px; box-sizing:border-box; font-family:Arial;">
-  <h3 style="color:#fff; margin:0 0 8px 0;">Metric Name</h3>
-  <p><span style="color:#fff;"><strong>Description:</strong></span> <span style="color:#ccc;">One-line description</span></p>
-  <p><span style="color:#fff;"><strong>Calculation:</strong></span> <span style="color:#ccc;">Formula here</span></p>
-</div>
-`;
+Generate a set of monthly performance studies tailored specifically for a business in the "${sector}" sector.
+
+Each study should include:
+- A **Metric Name**
+- A **Short Description**
+- A **Scaling Method** that allows firms of all sizes (small and large) to compare fairly.
+
+Format your response as a clean HTML block, suitable for display as mobile-friendly cards (stacked vertically). Use white headers, grey text, and subtle spacing.
+
+Avoid any summary or intro — just output the styled study cards.
+  `;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const chatResponse = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant that generates sector-specific performance study cards in HTML.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.6,
     });
 
-    const reply = completion.choices[0].message.content;
+    const reply = chatResponse.choices[0].message.content;
     res.send(reply);
   } catch (error) {
     console.error("OpenAI error:", error);
-    res.status(500).send("Something went wrong");
+    res.status(500).send(`
+      <div style="color: white; font-family: sans-serif;">
+        <h2>Something went wrong</h2>
+        <p style="color: grey;">Our content generator is temporarily unavailable. Please try again later.</p>
+      </div>
+    `);
   }
 });
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
+
