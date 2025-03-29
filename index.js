@@ -41,7 +41,7 @@ Return only the paragraph — no heading or HTML tags.
     const metricPrompt = `
 Generate 6–8 benchmarking studies tailored to the "${sector}" sector.
 
-Make sure the FIRST study is highly relevant to the sector and uses sector-specific terminology.
+The FIRST study must be the most important and widely tracked metric for the sector — something the majority of businesses in this field already monitor (e.g. revenue per client, billable hours, retention rate, etc). It should be clearly sector-relevant.
 
 Each study should include:
 - A metric name
@@ -85,3 +85,4 @@ Only return the list of HTML blocks. No intro, headings or notes.
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
+
