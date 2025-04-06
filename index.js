@@ -29,8 +29,7 @@ Write 2 short and original sentences that:
 
 Be specific, original, and vary tone and phrasing — avoid repeating sentence structure across uses.
 
-Example:
-"Chemists can use Peerformance to benchmark against similar businesses like independents, regional chains, or in-store pharmacies. Peer groups can be refined by geography for extra relevance. Here are some useful studies to consider."
+Only return a single version of the insight. Do not return multiple variations or repeats.
 `;
 
     const insightResponse = await openai.chat.completions.create({
@@ -42,16 +41,14 @@ Example:
     const insightText = insightResponse.choices[0].message.content;
 
     const metricPrompt = `
-Generate 6–8 benchmarking studies tailored to the "${sector}" sector, with a strong focus on identifying opportunities for business growth.
+Generate 6–8 benchmarking studies tailored to the "${sector}" sector.
 
-The FIRST study must be the most impactful growth-related metric — something widely tracked across this sector that indicates potential to increase revenue, expand client base, boost efficiency, or scale operations.
+The FIRST study must be the most important and widely tracked metric for the sector — something the majority of businesses in this field already monitor (e.g. revenue per client, billable hours, retention rate, etc). It should be clearly sector-relevant.
 
 Each study should include:
-- A clear and relevant metric name
-- A short explanation of what it measures and why it's useful
-- A simple calculation formula
-
-Focus on growth levers such as: client acquisition, upselling potential, churn rate, revenue per employee, market penetration, or operational bottlenecks.
+- A metric name
+- A short description
+- A clear calculation formula
 
 Format each study using this exact HTML structure:
 
@@ -61,7 +58,7 @@ Format each study using this exact HTML structure:
   <p style="color: grey; margin: 6px 0;"><span style="color: white; font-weight: normal;">Calculation:</span> [Formula]</p>
 </div>
 
-Only return the list of HTML blocks. Do not include a heading or intro.
+Only return the list of HTML blocks. No intro, headings or notes.
 `;
 
     const metricResponse = await openai.chat.completions.create({
@@ -89,6 +86,7 @@ Only return the list of HTML blocks. Do not include a heading or intro.
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
+
 
 
 
