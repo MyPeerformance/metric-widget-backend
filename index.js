@@ -42,14 +42,16 @@ Example:
     const insightText = insightResponse.choices[0].message.content;
 
     const metricPrompt = `
-Generate 6–8 benchmarking studies tailored to the "${sector}" sector.
+Generate 6–8 benchmarking studies tailored to the "${sector}" sector, with a strong focus on identifying opportunities for business growth.
 
-The FIRST study must be the most important and widely tracked metric for the sector — something the majority of businesses in this field already monitor (e.g. revenue per client, billable hours, retention rate, etc). It should be clearly sector-relevant.
+The FIRST study must be the most impactful growth-related metric — something widely tracked across this sector that indicates potential to increase revenue, expand client base, boost efficiency, or scale operations.
 
 Each study should include:
-- A metric name
-- A short description
-- A clear calculation formula
+- A clear and relevant metric name
+- A short explanation of what it measures and why it's useful
+- A simple calculation formula
+
+Focus on growth levers such as: client acquisition, upselling potential, churn rate, revenue per employee, market penetration, or operational bottlenecks.
 
 Format each study using this exact HTML structure:
 
@@ -59,7 +61,7 @@ Format each study using this exact HTML structure:
   <p style="color: grey; margin: 6px 0;"><span style="color: white; font-weight: normal;">Calculation:</span> [Formula]</p>
 </div>
 
-Only return the list of HTML blocks. No intro, headings or notes.
+Only return the list of HTML blocks. Do not include a heading or intro.
 `;
 
     const metricResponse = await openai.chat.completions.create({
@@ -87,5 +89,6 @@ Only return the list of HTML blocks. No intro, headings or notes.
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
+
 
 
